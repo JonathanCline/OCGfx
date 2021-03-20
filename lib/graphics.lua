@@ -1,5 +1,13 @@
 
-local graphics = {}
+local graphics =
+{
+    colorswap =
+    {
+        foreground = 0xFFFFFF,
+        background = 0x000000
+    }
+}
+
 local component = component or require("component")
 
 -- Sets the graphics libraries gpu
@@ -24,24 +32,41 @@ graphics.set_gpu = function(self, gpu)
 
 end
 
+-- Swaps foreground and background colors into reserve
+graphics.swap = function(self)
+    local fore = self.colorswap.foreground
+    self.colorswap.foreground = self.gpu.getForeground()
+    self.gpu.setForeground(fore)
+
+    local bgcol = self.colorswap.background
+    self.colorswap.background = self.gpu.getBackground()
+    self.gpu.setBackground(bgcol)
+end
+
+
+-- Sets foreground and background colors
+graphics.setcol = function(self, fg, bg)
+    self.colorswap.foreground = fg
+    self.colorswap.background = bg
+    self:swap()
+end
+
+
 -- Draws a rectangle on the screen
 graphics.rect = function(self, x, y, width, height, color)
     local _gpu = self.gpu
     assert(_gpu)
 
-    local _oldForeground = _gpu.getForeground()
-
-    local _col = color or 0xFFFFFF
-    _gpu.setForeground(_col)
+    local _color = color or 0xFFFFFF
+    self:setcol(_color, _color)
     _gpu.fill(x, y, width, height, " ")
-    _gpu.setForeground(_oldForeground)
+    self:swap()
 end
 
 -- Clears screen
-graphics.clear = function(self, color)
+graphics.clear = function(self)
     local _w, _h = self.gpu.getResolution()
-    local _col = color or 0x000000
-    self:rect(1, 1, _w, _h, _col)
+    self:rect(1, 1, _w, _h, 0x000000)
 end
 
 return graphics
