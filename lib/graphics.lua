@@ -11,9 +11,9 @@ graphics.set_gpu = function(self, gpu)
     if type(gpu) == "string" then
         _gpuAddr = gpu
     elseif type(gpu) == "table" then
-        _gpuAddr = gpu.address
+        _gpuAddr = component.proxy(gpu.address)
     else
-        _gpuAddr = component.list("gpu")()
+        _gpuAddr = component.proxy(component.list("gpu")())
     end
 
     if _gpuAddr then
